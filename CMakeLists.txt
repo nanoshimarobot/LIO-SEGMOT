@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(lio_segmot)
 
 set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++17")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g0 -pthread")
 
 find_package(catkin REQUIRED COMPONENTS
@@ -28,6 +28,7 @@ find_package(OpenMP REQUIRED)
 find_package(PCL REQUIRED QUIET)
 find_package(OpenCV REQUIRED QUIET)
 find_package(GTSAM REQUIRED QUIET)
+find_package(Boost REQUIRED COMPONENTS timer)
 
 add_message_files(
   DIRECTORY msg
@@ -79,6 +80,7 @@ include_directories(
 	${PCL_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
 	${GTSAM_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIRS}
 )
 
 # link directories
@@ -107,12 +109,12 @@ target_link_libraries(${PROJECT_NAME}_featureExtraction ${catkin_LIBRARIES} ${PC
 add_executable(${PROJECT_NAME}_mapOptimization src/mapOptimization.cpp src/factor.cpp src/solver.cpp)
 add_dependencies(${PROJECT_NAME}_mapOptimization ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 target_compile_options(${PROJECT_NAME}_mapOptimization PRIVATE ${OpenMP_CXX_FLAGS})
-target_link_libraries(${PROJECT_NAME}_mapOptimization ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${OpenMP_CXX_FLAGS} gtsam)
+target_link_libraries(${PROJECT_NAME}_mapOptimization ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${Boost_LIBRARIES} ${OpenMP_CXX_FLAGS} gtsam)
 
 # IMU Preintegration
 add_executable(${PROJECT_NAME}_imuPreintegration src/imuPreintegration.cpp)
-target_link_libraries(${PROJECT_NAME}_imuPreintegration ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} gtsam)
+target_link_libraries(${PROJECT_NAME}_imuPreintegration ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBRARIES} gtsam)
 
 # Offline ROSBag Player
 add_executable(${PROJECT_NAME}_offlineBagPlayer src/offlineBagPlayer.cpp)
-target_link_libraries(${PROJECT_NAME}_offlineBagPlayer ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} gtsam)
+target_link_libraries(${PROJECT_NAME}_offlineBagPlayer ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBRARIES} gtsam)
